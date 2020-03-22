@@ -36,7 +36,6 @@ public class ReplicatorAppmaster extends StaticEventingAppmaster implements Cont
 
         localhost = InetAddress.getLocalHost();
 
-        //createAllocationGroup();
         prepareContainersToRun();
 
         LOGGER.info("Successfully added interceptor and got localhost {}", localhost);
@@ -66,7 +65,7 @@ public class ReplicatorAppmaster extends StaticEventingAppmaster implements Cont
 
         containersContexts.add(rwContext);
 
-        //I hope this will work when we got to submitApplication(). Otherwise we should move realization in our class
+        //I hope this will work when we got to submitApplication(). Otherwise we should move realization to our class
         getParameters().setProperty("container-count", String.valueOf(containersContexts.size()));
     }
 

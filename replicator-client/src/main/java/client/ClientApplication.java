@@ -1,18 +1,29 @@
-package client.impl;
+package client;
 
-import client.AbstractYarnClient;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.yarn.client.YarnClient;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
-public class ClientApplication extends AbstractYarnClient {
+@EnableAutoConfiguration
+public class ClientApplication {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ClientApplication.class);
+    protected static YarnClient yarnClient;
+    protected static ApplicationId applicationId;
+    protected static ConfigurableApplicationContext context;
 
     public static void main(String[] args) {
-        runClient(args);
+        LOGGER.info("Starting an app");
+        context = SpringApplication.run(ClientApplication.class, args);
+        yarnClient = context.getBean(YarnClient.class);
+        applicationId = yarnClient.submitApplication();
         monitor();
     }
 

@@ -1,33 +1,30 @@
 spring:
   hadoop:
-    fsUri: hdfs://localhost:9000
+    #fsUri: hdfs://localhost:8020
     resourceManagerHost: localhost
   #is it really necessary to keep all this file in config?
-  resources:
-    - file:/etc/hadoop/conf/core-site.xml
-    - file:/etc/hadoop/conf/yarn-site.xml
-    - file:/etc/hadoop/conf/hdfs-site.xml
-    - file:/etc/hadoop/conf/hbase-site.xml
+    resources:
+      - file:/etc/hadoop/2.6.5.0-292/0/core-site.xml
+      - file:/etc/hadoop/2.6.5.0-292/0/yarn-site.xml
+      - file:/etc/hadoop/2.6.5.0-292/0/hdfs-site.xml
+      #- file:/etc/hadoop/conf/hbase-site.xml
   yarn:
     appName: replicator-${flow.id}
     #mb /user/${user.name}?
     applicationDir: /apps/replicator/app
     client:
       files:
-        - "file:build/lib/replicator-appmaster.jar"
-        - "file:build/lib/replicator-container.jar"
+        - "file:replicator-appmaster-1.0-SNAPSHOT.jar"
+        - "file:replicator-container-1.0-SNAPSHOT.jar"
       localizer:
         patterns:
           - "*.jar"
           - "*.yml"
           - "*.properties"
       launchcontext:
-        archiveFile: replicator-appmaster.jar
+        archiveFile: replicator-appmaster-1.0-SNAPSHOT.jar
         options:
           - -Dflow.id=${flow.id:$$}
     appmaster:
-      containerCount: 1
       launchcontext:
-        archiveFile: replicator-container.jar
-        arguments:
-          --my.container.arg1: 1
+        archiveFile: replicator-container-1.0-SNAPSHOT.jar
