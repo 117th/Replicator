@@ -13,10 +13,12 @@ import org.springframework.yarn.am.StaticEventingAppmaster;
 import org.springframework.yarn.am.allocate.ContainerAllocateData;
 import org.springframework.yarn.am.allocate.DefaultContainerAllocator;
 import org.springframework.yarn.am.container.AbstractLauncher;
+import org.springframework.yarn.annotation.YarnComponent;
 
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,8 +37,6 @@ public class ReplicatorAppmaster extends StaticEventingAppmaster implements Cont
         ((AbstractLauncher) getLauncher()).addInterceptor(this);
 
         localhost = InetAddress.getLocalHost();
-
-        prepareContainersToRun();
 
         LOGGER.info("Successfully added interceptor and got localhost {}", localhost);
     }
@@ -66,13 +66,18 @@ public class ReplicatorAppmaster extends StaticEventingAppmaster implements Cont
         containersContexts.add(rwContext);
 
         //I hope this will work when we got to submitApplication(). Otherwise we should move realization to our class
+        LOGGER.info("Params: {}", getParameters());
+        System.out.println(getParameters());
+        if (getParameters() == null) setParameters(new Properties());
         getParameters().setProperty("container-count", String.valueOf(containersContexts.size()));
+
     }
 
     @Override
     public void submitApplication() {
         super.submitApplication();
-        //allocateContainers(1, "RW-CONTAINER");
+        prepareContainersToRun();
+        allocateContainers(1, "RW-CONTAINER");
     }
 
     //intercept for adding localhost (I hope this works)
