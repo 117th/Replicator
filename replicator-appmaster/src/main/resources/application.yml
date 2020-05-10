@@ -7,27 +7,10 @@ spring:
       - file:/etc/hadoop/2.6.5.0-292/0/core-site.xml
       - file:/etc/hadoop/2.6.5.0-292/0/yarn-site.xml
       - file:/etc/hadoop/2.6.5.0-292/0/hdfs-site.xml
-      #- file:/etc/hadoop/conf/hbase-site.xml
   yarn:
     appName: replicator-${flow.id}
-    #mb /user/${user.name}?
     applicationDir: /apps/replicator/app
-    client:
-      files:
-        - "file:replicator-appmaster-1.0-SNAPSHOT.jar"
-        - "file:replicator-container-1.0-SNAPSHOT.jar"
-      localizer:
-        patterns:
-          - "*.jar"
-          - "*.yml"
-          - "*.properties"
-      launchcontext:
-        archiveFile: replicator-appmaster-1.0-SNAPSHOT.jar
-        options:
-          - -Dflow.id=${flow.id:$$}
     appmaster:
       appmaster-class: appmaster.ReplicatorAppmaster
-      files:
-        - "file:replicator-appmaster-1.0-SNAPSHOT.jar"
       launchcontext:
         archiveFile: replicator-container-1.0-SNAPSHOT.jar

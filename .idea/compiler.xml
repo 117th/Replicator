@@ -6,10 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="replicator-core" />
+        <module name="replicator-appmaster" />
         <module name="replicator-container" />
         <module name="replicator-client" />
-        <module name="replicator-appmaster" />
+        <module name="replicator-core" />
       </profile>
     </annotationProcessing>
   </component>

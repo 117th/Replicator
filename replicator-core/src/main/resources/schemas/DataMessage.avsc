@@ -1,0 +1,12 @@
+{
+   "type" : "record",
+   "namespace" : "core.kafka.vo",
+   "name" : "DataMessage",
+   "fields" : [
+      { "name" : "table" , "type" : "string" },
+      { "name" : "timestamp" , "type" : "long" },
+      { "name" : "data" , "type" : "bytes" },
+      { "name" : "record_key" , "type" : "string" },
+      { "name" : "operation" , "type" : "string" }
+   ]
+}

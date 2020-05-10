@@ -6,8 +6,13 @@ import org.apache.hadoop.yarn.api.records.Container;
 import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.api.records.ContainerLaunchContext;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.yarn.am.ContainerLauncherInterceptor;
 import org.springframework.yarn.am.StaticEventingAppmaster;
 import org.springframework.yarn.am.allocate.ContainerAllocateData;
@@ -16,10 +21,7 @@ import org.springframework.yarn.am.container.AbstractLauncher;
 import org.springframework.yarn.annotation.YarnComponent;
 
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -29,6 +31,10 @@ public class ReplicatorAppmaster extends StaticEventingAppmaster implements Cont
     private ConcurrentHashMap<ContainerId, Container> containers = new ConcurrentHashMap<>();
     private Queue<ContainerRWContext> containersContexts = new ConcurrentLinkedQueue<>();
     private InetAddress localhost;
+    @Value("${topicName}")
+    private String topicName;
+    @Value("${kafkaBrokerIp}")
+    private String kafkaBrokerIp;
 
     @Override
     protected void onInit() throws Exception {
@@ -59,11 +65,18 @@ public class ReplicatorAppmaster extends StaticEventingAppmaster implements Cont
 
     private void prepareContainersToRun() {
 
-        ContainerRWContext rwContext = new ContainerRWContext();
-        rwContext.setTopic("TOPIC");
-        rwContext.setPartition(0);
+        Properties kafkaProps = new Properties();
+        kafkaProps.put("bootstrap.servers", kafkaBrokerIp);
+        Consumer<byte[], byte[]> tempConsumer = new KafkaConsumer<byte[], byte[]>(kafkaProps, new ByteArrayDeserializer(), new ByteArrayDeserializer());
+        List<PartitionInfo> partitionInfos = tempConsumer.partitionsFor(topicName);
 
-        containersContexts.add(rwContext);
+        for(PartitionInfo partitionInfo : partitionInfos) {
+            ContainerRWContext rwContext = new ContainerRWContext();
+            rwContext.setTopic(topicName);
+            rwContext.setPartition(partitionInfo.partition());
+            rwContext.setKafkaBrokerIp(kafkaBrokerIp);
+            containersContexts.add(rwContext);
+        }
 
         //I hope this will work when we got to submitApplication(). Otherwise we should move realization to our class
         LOGGER.info("Params: {}", getParameters());
